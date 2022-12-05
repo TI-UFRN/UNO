@@ -13,11 +13,11 @@ CARD *createCard(char *cardString) {
 
     int initSub = 0;
     if(c->value[0] == '1') {
-        c->number = calloc(0, sizeof(c->value));
+        c->number = calloc(strlen(c->value), sizeof(char));
         strncpy(c->number, c->value, 2);
         initSub = 2;
     } else {
-        c->number = calloc(0, sizeof(c->value));
+        c->number = calloc(strlen(c->value), sizeof(char));
         strncpy(c->number, c->value, 1);
         initSub = 1;
     }
