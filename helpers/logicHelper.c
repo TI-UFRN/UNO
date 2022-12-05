@@ -5,18 +5,57 @@
 #include "../definitions/card.h"
 #include "../definitions/hand.h"
 #include "../definitions/constants.h"
+#include "../definitions/suits.h"
 
 #include "../helpers/creationHelper.h"
 #include "../helpers/handHelper.h"
 #include "../helpers/printHelper.h"
 #include "../helpers/cardHelper.h"
 
+int quantSuitInHand(HAND *hand, char *suit)
+{
+    int cont = 0;
+    for (int i = 0; i < hand->amountCards; i++)
+    {
+        if (strcmp(suit, hand->cards[i]->suit) == 0 && strcmp("C", hand->cards[i]->number) != 0 && strcmp("A", hand->cards[i]->number) != 0)
+        {
+            cont++;
+        }
+    }
+    return cont;
+}
+
 char *chooseBestSuit(HAND *hand)
 {
     char *suit = calloc(10, sizeof(char));
     strcpy(suit, hand->cards[0]->suit);
 
-    return suit;
+    int amountHearts = quantSuitInHand(hand, HEARTS_U);
+    int amountDiamonds = quantSuitInHand(hand, DIAMONDS_U);
+    int amountClubs = quantSuitInHand(hand, CLUBS_U);
+    int amountSpades = quantSuitInHand(hand, SPADES_U);
+
+    int amounts[] = {amountHearts, amountDiamonds, amountClubs, amountSpades};
+
+    int index = 0;
+
+    for (int i = 0; i < 4; i++)
+        if (amounts[i] > amounts[index])
+            index = i;
+
+    switch (index)
+    {
+    case 0:
+        return HEARTS_U;
+        break;
+    case 1:
+        return DIAMONDS_U;
+    case 2:
+        return CLUBS_U;
+    case 3:
+        return SPADES_U;
+        return HEARTS_U;
+    }
 }
 
 CARD *chooseBestCard(CARD *topCard, HAND *hand)

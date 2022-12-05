@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "./definitions/constants.h"
+#include "./definitions/suits.h"
 
 #include "./helpers/handHelper.h"
 #include "./helpers/printHelper.h"
@@ -31,7 +32,7 @@ int main()
 
     char action[MAX_ACTION];
     char complement[MAX_LINE];
-
+    
     while (1)
     {
         do
