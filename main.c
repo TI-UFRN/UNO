@@ -38,10 +38,6 @@ int main()
         {
             scanf("%s %s", action, complement);
             actionAnotherPlayer(action, topTable, complement);
-            char string[50] = {"Top table: "};
-            strcat(string, topTable->number);
-            strcat(string, topTable->suit);
-            debug(string);
         } while (strcmp(action, "TURN") || strcmp(complement, myself));
         myAction(topTable, hand);
     }

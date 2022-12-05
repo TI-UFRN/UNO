@@ -11,7 +11,8 @@
 #include "../helpers/printHelper.h"
 #include "../helpers/cardHelper.h"
 
-char *chooseBestSuit(HAND *hand) {
+char *chooseBestSuit(HAND *hand)
+{
     char *suit = calloc(10, sizeof(char));
     strcpy(suit, hand->cards[0]->suit);
 
@@ -20,8 +21,10 @@ char *chooseBestSuit(HAND *hand) {
 
 CARD *chooseBestCard(CARD *topCard, HAND *hand)
 {
-    for(int i = 0; i < hand->amountCards; i++) {
-        if(cardIsEqualsSuit(topCard, hand->cards[i]) || cardIsEqualsNumber(topCard, hand->cards[i])) {
+    for (int i = 0; i < hand->amountCards; i++)
+    {
+        if (cardIsEqualsSuit(topCard, hand->cards[i]) || cardIsEqualsNumber(topCard, hand->cards[i]))
+        {
             CARD *choice = createCard(hand->cards[i]->value);
             removeFromHand(hand, hand->cards[i]);
             return choice;
@@ -42,7 +45,6 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
         {
             char complement2[MAX_LINE];
             scanf(" %s", complement2);
-            debug(complement2);
             topTable->suit = complement2;
         }
     }
@@ -50,10 +52,6 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
 
 void myAction(CARD *topTable, HAND *hand)
 {
-    for(int i = 0; i< hand->amountCards; i++) {
-        fprintf(stderr, "%d - %s\n", i, hand->cards[i]->value);
-    }
-
     if (strcmp(topTable->number, "V") == 0)
     {
         char cardString1[MAX_LINE];
@@ -101,11 +99,12 @@ void myAction(CARD *topTable, HAND *hand)
     }
     else
     {
-        if(strcmp(choice->number, "C") == 0 || strcmp(choice->number, "A") == 0) {
-            debug(choice->value);
+        if (strcmp(choice->number, "C") == 0 || strcmp(choice->number, "A") == 0)
+        {
             printf("DISCARD %s%s %s\n", choice->number, choice->suit, chooseBestSuit(hand));
-        } else {
-            debug(choice->value);
+        }
+        else
+        {
             printf("DISCARD %s%s\n", choice->number, choice->suit);
         }
     }
