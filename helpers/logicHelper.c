@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../definitions/card.h"
+#include "../definitions/hand.h"
+#include "../definitions/constants.h"
+
 #include "../helpers/creationHelper.h"
 #include "../helpers/handHelper.h"
 #include "../helpers/printHelper.h"
 #include "../helpers/cardHelper.h"
-
-#include "../definitions/card.h"
-#include "../definitions/hand.h"
-#include "../definitions/constants.h"
 
 char *chooseBestSuit(HAND *hand) {
     char *suit = calloc(10, sizeof(char));
@@ -42,6 +42,7 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
         {
             char complement2[MAX_LINE];
             scanf(" %s", complement2);
+            debug(complement2);
             topTable->suit = complement2;
         }
     }
@@ -49,6 +50,10 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
 
 void myAction(CARD *topTable, HAND *hand)
 {
+    for(int i = 0; i< hand->amountCards; i++) {
+        fprintf(stderr, "%d - %s\n", i, hand->cards[i]->value);
+    }
+
     if (strcmp(topTable->number, "V") == 0)
     {
         char cardString1[MAX_LINE];
@@ -97,9 +102,11 @@ void myAction(CARD *topTable, HAND *hand)
     else
     {
         if(strcmp(choice->number, "C") == 0 || strcmp(choice->number, "A") == 0) {
-            printf("DISCARD %s %s\n", choice->value, chooseBestSuit(hand));
+            debug(choice->value);
+            printf("DISCARD %s%s %s\n", choice->number, choice->suit, chooseBestSuit(hand));
         } else {
-            printf("DISCARD %s\n", choice->value);
+            debug(choice->value);
+            printf("DISCARD %s%s\n", choice->number, choice->suit);
         }
     }
 }

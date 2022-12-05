@@ -34,7 +34,7 @@ void removeFromHand(HAND *hand, CARD *card)
         *(hand->cards[i + 1]) = *aux;
     }
 
-    free(hand->cards[hand->amountCards - 1]);
+    //free(hand->cards[hand->amountCards - 1]);
     hand->cards = realloc(hand->cards, (hand->amountCards - 1) * sizeof(CARD));
     hand->amountCards = hand->amountCards - 1;
 }

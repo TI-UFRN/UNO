@@ -3,6 +3,7 @@
 
 #include "../definitions/card.h"
 #include "../definitions/hand.h"
+
 #include "./handHelper.h"
 #include "./printHelper.h"
 
