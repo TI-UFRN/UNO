@@ -22,7 +22,7 @@ CARD *createCard(char *cardString) {
         initSub = 1;
     }
 
-    c->suit = calloc(0, sizeof(c->value));
+    c->suit = calloc(strlen(c->value), sizeof(char));
     strncpy(c->suit, c->value + initSub, strlen(c->value));
 
     return c;
