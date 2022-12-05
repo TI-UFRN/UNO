@@ -1,16 +1,20 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "./definitions/constants.h"
+#include "./helpers/handHelper.h"
 #include "./helpers/printHelper.h"
 #include "./helpers/creationHelper.h"
+#include "./helpers/logicHelper.h"
 
-int main() {
+int main()
+{
     setbuf(stdin, NULL);
     setbuf(stdout, NULL);
     setbuf(stderr, NULL);
 
-    char myself[MAX_ID_SIZE];
+    char *myself = calloc(MAX_ID_SIZE, sizeof(char));
     char players[MAX_LINE];
     char handString[MAX_LINE];
     char initialTopTableString[MAX_LINE];
@@ -32,14 +36,9 @@ int main() {
         do
         {
             scanf("%s %s", action, complement);
-            char init[10] = {"ACAO: "};
-            strcat(init, action);
-            debug(init);
-            debug(complement);
+            actionAnotherPlayer(action, topTable, complement);
         } while (strcmp(action, "TURN") || strcmp(complement, myself));
-
-        char card[] = "A♥ ♥";
-        printf("DISCARD %s\n", card);
+        myAction(topTable, hand);
     }
 
     return 0;

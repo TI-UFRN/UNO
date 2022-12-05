@@ -7,3 +7,7 @@ void addToHand(HAND *hand, CARD *card) {
     hand->cards[hand->amountCards] = card;
     hand->amountCards = hand->amountCards + 1;
 }
+
+void removeFromHand(HAND *hand, CARD *card) {
+    
+}
