@@ -7,17 +7,21 @@
 #include "./handHelper.h"
 #include "./printHelper.h"
 
-CARD *createCard(char *cardString) {
+CARD *createCard(char *cardString)
+{
     CARD *c = calloc(1, sizeof(CARD));
     c->value = calloc(10, sizeof(char));
-    c->value = cardString;
+    strcpy(c->value, cardString);
 
     int initSub = 0;
-    if(c->value[0] == '1') {
+    if (c->value[0] == '1')
+    {
         c->number = calloc(strlen(c->value), sizeof(char));
         strncpy(c->number, c->value, 2);
         initSub = 2;
-    } else {
+    }
+    else
+    {
         c->number = calloc(strlen(c->value), sizeof(char));
         strncpy(c->number, c->value, 1);
         initSub = 1;
@@ -29,21 +33,24 @@ CARD *createCard(char *cardString) {
     return c;
 }
 
-HAND *createHand(char *handString) {
+HAND *createHand(char *handString)
+{
     HAND *h = calloc(1, sizeof(HAND));
     h->cards = calloc(0, sizeof(CARD *));
     h->amountCards = 0;
 
     char delim[] = " ";
-	char *split = strtok(handString, delim);
+    char *split = strtok(handString, delim);
 
-	while(split != NULL) {
-        if(split[0] != '[' && split[0] != ']') {
+    while (split != NULL)
+    {
+        if (split[0] != '[' && split[0] != ']')
+        {
             CARD *c = createCard(split);
-            addToHand(h, c); 
+            addToHand(h, c);
         }
-		split = strtok(NULL, delim);
-	}
+        split = strtok(NULL, delim);
+    }
 
     return h;
 }

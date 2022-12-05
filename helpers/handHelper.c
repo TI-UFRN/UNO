@@ -4,12 +4,15 @@
 #include "../definitions/card.h"
 #include "../definitions/hand.h"
 
+#include "../helpers/printHelper.h"
+#include "../helpers/creationHelper.h"
+
 int indexOf(HAND *, CARD *);
 
 void addToHand(HAND *hand, CARD *card)
 {
-    hand->cards = realloc(hand->cards, (hand->amountCards + 1) * sizeof(CARD));
-    hand->cards[hand->amountCards] = card;
+    hand->cards = realloc(hand->cards, (hand->amountCards + 1) * sizeof(CARD *));
+    hand->cards[hand->amountCards] = createCard(card->value);
     hand->amountCards = hand->amountCards + 1;
 }
 
@@ -34,8 +37,8 @@ void removeFromHand(HAND *hand, CARD *card)
         *(hand->cards[i + 1]) = *aux;
     }
 
-    //free(hand->cards[hand->amountCards - 1]);
-    hand->cards = realloc(hand->cards, (hand->amountCards - 1) * sizeof(CARD));
+    free(hand->cards[hand->amountCards - 1]);
+    hand->cards = realloc(hand->cards, (hand->amountCards - 1) * sizeof(CARD *));
     hand->amountCards = hand->amountCards - 1;
 }
 
