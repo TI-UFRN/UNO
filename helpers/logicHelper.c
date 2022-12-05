@@ -1,16 +1,33 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "../helpers/creationHelper.h"
-#include "../helpers/handHelper.h"
-#include "../helpers/printHelper.h"
 #include "../definitions/card.h"
 #include "../definitions/hand.h"
 #include "../definitions/constants.h"
 
+#include "../helpers/creationHelper.h"
+#include "../helpers/handHelper.h"
+#include "../helpers/printHelper.h"
+#include "../helpers/cardHelper.h"
+
+char *chooseBestSuit(HAND *hand) {
+    char *suit = calloc(10, sizeof(char));
+    strcpy(suit, hand->cards[0]->suit);
+
+    return suit;
+}
+
 CARD *chooseBestCard(CARD *topCard, HAND *hand)
 {
-    // return NULL;
+    for(int i = 0; i < hand->amountCards; i++) {
+        if(cardIsEqualsSuit(topCard, hand->cards[i]) || cardIsEqualsNumber(topCard, hand->cards[i])) {
+            CARD *choice = createCard(hand->cards[i]->value);
+            removeFromHand(hand, hand->cards[i]);
+            return choice;
+        }
+    }
+    return NULL;
 }
 
 void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
@@ -25,6 +42,7 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
         {
             char complement2[MAX_LINE];
             scanf(" %s", complement2);
+            debug(complement2);
             topTable->suit = complement2;
         }
     }
@@ -32,7 +50,10 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
 
 void myAction(CARD *topTable, HAND *hand)
 {
-    debug(topTable->number);
+    for(int i = 0; i< hand->amountCards; i++) {
+        fprintf(stderr, "%d - %s\n", i, hand->cards[i]->value);
+    }
+
     if (strcmp(topTable->number, "V") == 0)
     {
         char cardString1[MAX_LINE];
@@ -68,8 +89,7 @@ void myAction(CARD *topTable, HAND *hand)
         return;
     }
 
-    chooseBestCard(topTable, hand);
-    CARD *choice = NULL;
+    CARD *choice = chooseBestCard(topTable, hand);
 
     if (choice == NULL)
     {
@@ -81,6 +101,12 @@ void myAction(CARD *topTable, HAND *hand)
     }
     else
     {
-        printf("DISCARD %s\n", choice->value);
+        if(strcmp(choice->number, "C") == 0 || strcmp(choice->number, "A") == 0) {
+            debug(choice->value);
+            printf("DISCARD %s%s %s\n", choice->number, choice->suit, chooseBestSuit(hand));
+        } else {
+            debug(choice->value);
+            printf("DISCARD %s%s\n", choice->number, choice->suit);
+        }
     }
 }
