@@ -6,6 +6,7 @@
 #include "../definitions/hand.h"
 #include "../definitions/constants.h"
 #include "../definitions/suits.h"
+#include "../definitions/phrases.h"
 
 #include "../helpers/creationHelper.h"
 #include "../helpers/handHelper.h"
@@ -91,6 +92,11 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
 
 void myAction(CARD *topTable, HAND *hand)
 {
+    if ((rand() % 100) < 50)
+    {
+        printf("SAY %s\n", PHRASES[rand() % 9]);
+    }
+
     if (strcmp(topTable->number, "V") == 0)
     {
         char cardString1[MAX_LINE];
@@ -138,9 +144,15 @@ void myAction(CARD *topTable, HAND *hand)
     }
     else
     {
+        if (hand->amountCards == 0)
+        {
+            printf("SAY UNOOO!!!\n");
+        }
         if (strcmp(choice->number, "C") == 0 || strcmp(choice->number, "A") == 0)
         {
-            printf("DISCARD %s%s %s\n", choice->number, choice->suit, chooseBestSuit(hand));
+            char *bestSuit = chooseBestSuit(hand);
+            strcpy(topTable->suit, bestSuit);
+            printf("DISCARD %s%s %s\n", choice->number, choice->suit, bestSuit);
         }
         else
         {

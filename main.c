@@ -32,7 +32,7 @@ int main()
 
     char action[MAX_ACTION];
     char complement[MAX_LINE];
-    
+
     while (1)
     {
         do
