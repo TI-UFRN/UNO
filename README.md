@@ -320,6 +320,22 @@ void removeFromHand(HAND *hand, CARD *card)
 }
 ```
 
+O método auxiliar indexOf() recebe uma CARD a ser encontrada em uma HAND também recebida, retornando seu index.
+
+```c
+int indexOf(HAND *hand, CARD *card)
+{
+    for (int i = 0; i < hand->amountCards; i++)
+    {
+        if (strcmp(hand->cards[i]->number, card->number) == 0 && strcmp(hand->cards[i]->suit, card->suit) == 0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+```
+
 ## creationHelper
 
 O creationHelper possui os métodos responsáveis por criar variáveis do tipo CARD e HAND. 
@@ -399,6 +415,19 @@ HAND *createHand(char *handString)
 
     return h;
 }
+```
+
+## logicHelper
+
+O arquivo logicHelper contém as principais funções responsáveis pela lógica do bot.
+
+```h
+#include "../definitions/card.h"
+#include "../definitions/hand.h"
+
+CARD *chooseBestCard(CARD *topCard, HAND *hand);
+void actionAnotherPlayer(char *, CARD *, char *);
+void myAction(CARD *, HAND *);
 ```
 
 ## :memo: License ##
