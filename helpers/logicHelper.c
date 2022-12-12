@@ -150,8 +150,12 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
 {
     if (strcmp(action, "DISCARD") == 0)
     {
-
         CARD *new = createCard(complement);
+        if (!cardIsEqualsSuit(new, topTable) && !cardIsEqualsNumber(new, topTable) && !strcmp(new->number, "C") && !strcmp(new->number, "V"))
+        {
+            return;
+        }
+
         *topTable = *new;
 
         if (strcmp(topTable->number, "C") == 0 || strcmp(topTable->number, "A") == 0)
