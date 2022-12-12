@@ -430,6 +430,279 @@ void actionAnotherPlayer(char *, CARD *, char *);
 void myAction(CARD *, HAND *);
 ```
 
+Um dos principais métodos é o chooseBestCard(), que retorna um ponteiro para uma CARD e recebe como parâmetro um ponteiro para CARD representando a CARD no topo da mesa e um ponteiro para a HAND do jogador.
+
+A lógica inicial é jogar todas as cartas de ação primeiro, para que os outros jogadores comprem mais cartas.
+Incialmente, é procurada cartas do tipo Valete, depois Coringa e em seguida Rei, se encontrada, a carta é retornada e retirada da HAND.
+Caso nenhuma dessas cartas de ação estejam presentes na HAND, qualquer carta que tenha o número ou naipe iguais a carta de topo da mesa é retornada.
+
+Caso, mesmo assim, nenhuma carta seja encontrada, é procurado alguma carta Ás na HAND, caso encontrada, é retornada, caso não o método retorna NULL.
+
+```c
+CARD *chooseBestCard(CARD *topCard, HAND *hand)
+{
+    // Find any valete
+    int i = getIndexCardBy(VALUE_AND, topCard->suit, "V", hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    // Find any Coringa
+    i = getIndexCardBy(NUMBER, "", "C", hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    // Find any Rei
+
+    i = getIndexCardBy(VALUE_AND, topCard->suit, "R", hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    // Find any
+    i = getIndexCardBy(VALUE_OR, topCard->suit, topCard->number, hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    // Find any ÁS
+    i = getIndexCardBy(NUMBER, "", "A", hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    return NULL;
+}
+```
+
+O método actionAnotherPlayer() é executado quando outro jogados está jogando. Sem retorno, o método recebe uma string com a ação do jogador, um ponteiro para CARD representando a carta em cima da mesa e uma string com o complemento da jogada.
+
+Caso a jogada seja BUY e a carta em cima da mesa seja valete ou coringa, o número da carta é alterado para o valor "X", indicando que outro jogador já comprou as cartas refetente a jogada.
+
+Caso o outro jogador tenha jogado um DISCARD, é feita uma validação para saber se a jogada é válida, caso não, o método é encerrado.
+
+Com a jogada válida, a carta em cima da mesa é trocada para a carta que foi jogada. Caso a carta seja um coringa ou um Ás, é lido o segundo complemento representando o novo valor para o naipe e setado na atual carta do topo da mesa.
+
+```c
+void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
+{
+    if (strcmp(action, "BUY") == 0 && (strcmp(topTable->number, "V") == 0 || strcmp(topTable->number, "C") == 0))
+    {
+        strcpy(topTable->number, "X");
+        return;
+    }
+
+    if (strcmp(action, "DISCARD") == 0)
+    {
+        CARD *new = createCard(complement);
+        if (!cardIsEqualsSuit(new, topTable) && !cardIsEqualsNumber(new, topTable) && !strcmp(new->number, "C") && !strcmp(new->number, "A"))
+        {
+            return;
+        }
+
+        *topTable = *new;
+
+        if (strcmp(topTable->number, "C") == 0 || strcmp(topTable->number, "A") == 0)
+        {
+            char complement2[MAX_LINE];
+            scanf(" %s", complement2);
+            topTable->suit = complement2;
+        }
+    }
+```
+
+A ação do jogador do bot é feita com auxílio do método sem retorno chamado myAction(), que recebe um ponteiro para uma CARD que representa a carta em cima da mesa e um ponteiro para a HAND do jogador.
+
+Caso a carta em cima da mesa sejá um valete é comprada 2 cartas, caso seja um coringa, é comprada 4.
+
+O método continua caso as etapas anteriores não sejam executadas. 
+Um ponteiro para uma CARD é gerado a partir da chamada do método chooseBestCard.
+
+Caso o ponteiro seja NULL, é comprada uma carta e o método é encerrado.
+Caso o ponteiro aponte para uma CARD com número igual a "C" ou "A", é chamado o método auxiliar chooseBestSuit() para pegar o melhor naipe para ser trocado.
+No fim, a carta é descartada.
+
+```c
+void myAction(CARD *topTable, HAND *hand)
+{
+    if ((rand() % 100) < 50)
+    {
+        printf("SAY %s\n", PHRASES[rand() % 9]);
+    }
+
+    if (strcmp(topTable->number, "V") == 0)
+    {
+        char cardString1[MAX_LINE];
+        char cardString2[MAX_LINE];
+        printf("BUY 2\n");
+        scanf("%s %s\n", cardString1, cardString2);
+
+        CARD *more1 = createCard(cardString1);
+        CARD *more2 = createCard(cardString2);
+
+        addToHand(hand, more1);
+        addToHand(hand, more2);
+        return;
+    }
+    else if (strcmp(topTable->number, "C") == 0)
+    {
+        char cardString1[MAX_LINE];
+        char cardString2[MAX_LINE];
+        char cardString3[MAX_LINE];
+        char cardString4[MAX_LINE];
+        printf("BUY 4\n");
+        scanf("%s %s %s %s\n", cardString1, cardString2, cardString3, cardString4);
+
+        CARD *more1 = createCard(cardString1);
+        CARD *more2 = createCard(cardString2);
+        CARD *more3 = createCard(cardString3);
+        CARD *more4 = createCard(cardString4);
+
+        addToHand(hand, more1);
+        addToHand(hand, more2);
+        addToHand(hand, more3);
+        addToHand(hand, more4);
+        return;
+    }
+
+    CARD *choice = chooseBestCard(topTable, hand);
+
+    if (choice == NULL)
+    {
+        printf("BUY 1\n");
+        char cardString[MAX_LINE];
+        scanf("%s\n", cardString);
+        CARD *more = createCard(cardString);
+        addToHand(hand, more);
+    }
+    else
+    {
+        if (hand->amountCards == 0)
+        {
+            printf("SAY UNOOO!!!\n");
+        }
+        if (strcmp(choice->number, "C") == 0 || strcmp(choice->number, "A") == 0)
+        {
+            char *bestSuit = chooseBestSuit(hand);
+            strcpy(topTable->suit, bestSuit);
+            printf("DISCARD %s%s %s\n", choice->number, choice->suit, bestSuit);
+        }
+        else
+        {
+            printf("DISCARD %s%s\n", choice->number, choice->suit);
+        }
+    }
+}
+```
+
+O método auxilia quantSuitInHand() retorna um inteiro que representa a quantidade de cartas do naipe passado como parâmetro presente na HAND também passada como parâmetro.
+
+```c
+int quantSuitInHand(HAND *hand, char *suit)
+{
+    int cont = 0;
+    for (int i = 0; i < hand->amountCards; i++)
+    {
+        if (strcmp(suit, hand->cards[i]->suit) == 0 && strcmp("C", hand->cards[i]->number) != 0 && strcmp("A", hand->cards[i]->number) != 0)
+        {
+            cont++;
+        }
+    }
+    return cont;
+}
+```
+
+O método chooseBestSuit retorna o melhor naipe (mais quantitativo) para ser trocado, recebendo a HAND do jogador com o auxílio do quantSuitInHand();
+
+```c
+char *chooseBestSuit(HAND *hand)
+{
+    char *suit = calloc(10, sizeof(char));
+    strcpy(suit, hand->cards[0]->suit);
+
+    int amountHearts = quantSuitInHand(hand, HEARTS_U);
+    int amountDiamonds = quantSuitInHand(hand, DIAMONDS_U);
+    int amountClubs = quantSuitInHand(hand, CLUBS_U);
+    int amountSpades = quantSuitInHand(hand, SPADES_U);
+
+    int amounts[] = {amountHearts, amountDiamonds, amountClubs, amountSpades};
+
+    int index = 0;
+
+    for (int i = 0; i < 4; i++)
+        if (amounts[i] > amounts[index])
+            index = i;
+
+    switch (index)
+    {
+    case 0:
+        return HEARTS_U;
+    case 1:
+        return DIAMONDS_U;
+    case 2:
+        return CLUBS_U;
+    case 3:
+        return SPADES_U;
+    default:
+        return HEARTS_U;
+    }
+}
+```
+
+Por fim, o último método auxiliar do logicHelper, o getIndexCardBy() retorna o index de uma carta que corresponda a alguns requisitos passados como parâmetros.
+Primeiro, é recebido um ponteiro para um FIELD, representando o tipo de comparação que o método vai fazer (supracitado). Depois, duas strings com o valor do naipe e do número a ser comparado. Por fim, a HAND do jogador.
+
+```c
+int getIndexCardBy(FIELD f, char *stringSuit, char *stringNumber, HAND *hand)
+{
+    for (int i = 0; i < hand->amountCards; i++)
+    {
+        switch (f)
+        {
+        case VALUE_OR:
+            if (strcmp(hand->cards[i]->number, stringNumber) == 0 || strcmp(hand->cards[i]->suit, stringSuit) == 0)
+            {
+                return i;
+            }
+            break;
+        case VALUE_AND:
+            if (strcmp(hand->cards[i]->number, stringNumber) == 0 && strcmp(hand->cards[i]->suit, stringSuit) == 0)
+            {
+                return i;
+            }
+            break;
+        case NUMBER:
+            if (strcmp(hand->cards[i]->number, stringNumber) == 0)
+            {
+                return i;
+            }
+            break;
+        case SUIT:
+            if (strcmp(hand->cards[i]->suit, stringSuit) == 0)
+            {
+                return i;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return -1;
+}
+```
+
 ## :memo: License ##
 
 This project is under license from GLP. For more details, see the [LICENSE](LICENSE.md) file.

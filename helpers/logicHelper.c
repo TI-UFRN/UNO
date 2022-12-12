@@ -150,7 +150,6 @@ void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
 {
     if (strcmp(action, "BUY") == 0 && (strcmp(topTable->number, "V") == 0 || strcmp(topTable->number, "C") == 0))
     {
-        //debug("Entrou aq");
         strcpy(topTable->number, "X");
         return;
     }
