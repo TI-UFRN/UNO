@@ -223,6 +223,183 @@ void debug(char *message)
     fprintf(stderr, "%s\n", message);
 }
 ```
+## cardHelper
+
+O cardHelper.h expõe três métodos de comparação de cartas. O método cardIsEquals() compara o valor da carta (número e naipe), o cardIsEqualsNumber() compara o número e o cardIsEqualsSuit() o naipe.
+
+```h
+#include "../definitions/card.h"
+#include "../definitions/hand.h"
+
+int cardIsEquals(CARD *, CARD *);
+int cardIsEqualsNumber(CARD *, CARD *);
+int cardIsEqualsSuit(CARD *, CARD *);
+```
+
+Todos os três métodos recebem duas cartas para serem comparadas e retornar um inteiro, onde o valor 1 representa true e o valor 0 false.
+
+```c
+#include <string.h>
+
+#include "../definitions/card.h"
+#include "../definitions/hand.h"
+
+int cardIsEquals(CARD *c1, CARD *c2)
+{
+    return (strcmp(c1->number, c2->number) == 0 && strcmp(c1->suit, c2->suit) == 0) ? 1 : 0;
+}
+
+int cardIsEqualsNumber(CARD *c1, CARD *c2)
+{
+    return (strcmp(c1->number, c2->number) == 0) ? 1 : 0;
+}
+
+int cardIsEqualsSuit(CARD *c1, CARD *c2)
+{
+    return (strcmp(c1->suit, c2->suit) == 0) ? 1 : 0;
+}
+```
+
+## handHelper
+
+O handHelper é responsável por conter métodos que auxiliam variáveis do tipo HAND, contendo o método addToHand() que adiciona uma CARD na HAND e o método removeFromHand() que remove uma CARD da HAND.
+
+```h
+#include "../definitions/card.h"
+#include "../definitions/hand.h"
+
+void addToHand(HAND *, CARD *);
+void removeFromHand(HAND *hand, CARD *card);
+```
+
+Primeiro, o método addToHand() não tem retorno e recebe um ponteiro para uma HAND e outro para uma CARD.
+
+As CARDS presente na HAND recebida sofre uma realocação do seu tamanho + 1. O ponteiro presente na última posição recebe uma nova CARD a partir da CARD recebida e o AMOUNTCARD é incrementado.
+
+```c
+void addToHand(HAND *hand, CARD *card)
+{
+    hand->cards = realloc(hand->cards, (hand->amountCards + 1) * sizeof(CARD *));
+    hand->cards[hand->amountCards] = createCard(card->value);
+    hand->amountCards = hand->amountCards + 1;
+}
+```
+
+O método removeFromHand() presente no handHelper também não tem retorno e recebe como parâmetro um ponteiro para uma HAND e um ponteiro para uma CARD.
+
+Primeiro, caso a CARD não esteja presente na HAND o método é encerrado alí mesmo. Caso só haja uma CARD na HAND, o AMOUNTCARD é zerado, a memória do array de CARD é liberado e realocado para o tamanho 0.
+
+
+Por fim, para os demais casos, a CARD a ser removida é colocada para o final do array e é liberada a memória da posição, no final, realocado o tamanho do array -1.
+
+```c
+void removeFromHand(HAND *hand, CARD *card)
+{
+    int index = indexOf(hand, card);
+    if (index == -1)
+        return;
+
+    if (index == 0 && hand->amountCards == 1)
+    {
+        hand->amountCards = 0;
+        free(hand->cards[0]);
+        hand->cards = calloc(0, sizeof(CARD *));
+        return;
+    }
+
+    for (int i = index; i < hand->amountCards - 1; i++)
+    {
+        CARD *aux = hand->cards[i];
+        *(hand->cards[i]) = *(hand->cards[i + 1]);
+        *(hand->cards[i + 1]) = *aux;
+    }
+
+    free(hand->cards[hand->amountCards - 1]);
+    hand->cards = realloc(hand->cards, (hand->amountCards - 1) * sizeof(CARD *));
+    hand->amountCards = hand->amountCards - 1;
+}
+```
+
+## creationHelper
+
+O creationHelper possui os métodos responsáveis por criar variáveis do tipo CARD e HAND. 
+
+```h
+#include "../definitions/card.h"
+#include "../definitions/hand.h"
+
+CARD *createCard(char *);
+HAND *createHand(char *);
+```
+
+O método crateCard() é responsável por criar uma variável do tipo CARD a partir de uma string no formato: [NUMERO][NAIPE] recebida como parâmetro.
+Inicialmente é alocado um ponteiro para CARD de tamanho 1 * o tamanho da CARD. Depois, é alocado 10 posições de tamanho de char para o campo VALUE presente na CARD e o valor da carta passada como parâmetro é copiado com o método strcpy();
+
+O próximo passo é separar o número do naipe. O campo NUMBER e SUIT da CARD é alocado o mesmo tamanho do VALUE, e é copiada uma substring do início do value até a segunda posição (no caso do 10) ou até a primeira posição (os outros casos).
+
+Já o naipe da carta se inicia da posição 2 (no caso do número ser 10) ou na posição 1 (no restante dos casos para número) até o final da string presente no VALUE.
+
+Por fim, a CARD alocada é retornada.
+```c
+CARD *createCard(char *cardString)
+{
+    CARD *c = calloc(1, sizeof(CARD));
+    c->value = calloc(10, sizeof(char));
+    strcpy(c->value, cardString);
+
+    int initSub = 0;
+    if (c->value[0] == '1')
+    {
+        c->number = calloc(strlen(c->value), sizeof(char));
+        strncpy(c->number, c->value, 2);
+        initSub = 2;
+    }
+    else
+    {
+        c->number = calloc(strlen(c->value), sizeof(char));
+        strncpy(c->number, c->value, 1);
+        initSub = 1;
+    }
+
+    c->suit = calloc(strlen(c->value), sizeof(char));
+    strncpy(c->suit, c->value + initSub, strlen(c->value));
+
+    return c;
+}
+```
+
+O outro método presente no creationHelper é o createHand() que recebe uma string com a mão do jogador. Onde existem colchetes nas extremidades e as cartas são separadas por espaços.
+
+O primeiro passo é alocar um ponteiro para HAND de tamanho 1 * o tamanho de HAND. Depois, o array de cartas presente na HAND é iniciado vazio e o AMOUNTCARDS é iniciado com 0.
+
+Uma técnica conhecida como split, que consiste em criar substrings a partir de um delimitador e de outra string. O método utilizado para isso é o strtok() e o delimitador é um espaço vazio " ".
+
+Cada substring representa uma carta e é adicionada a HAND com auxílio do addHand().
+
+Por fim, é retornado o ponteiro da HAND alocada. 
+```c
+HAND *createHand(char *handString)
+{
+    HAND *h = calloc(1, sizeof(HAND));
+    h->cards = calloc(0, sizeof(CARD *));
+    h->amountCards = 0;
+
+    char delim[] = " ";
+    char *split = strtok(handString, delim);
+
+    while (split != NULL)
+    {
+        if (split[0] != '[' && split[0] != ']')
+        {
+            CARD *c = createCard(split);
+            addToHand(h, c);
+        }
+        split = strtok(NULL, delim);
+    }
+
+    return h;
+}
+```
 
 ## :memo: License ##
 
