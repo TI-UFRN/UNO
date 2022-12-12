@@ -12,6 +12,7 @@
   <a href="#sparkles-estrutura-do-código">Estrutura</a> &#xa0; | &#xa0;
   <a href="#sparkles-main">main.c</a> &#xa0; | &#xa0;
   <a href="#rocket-definitions">Definitions</a> &#xa0; | &#xa0;
+  <a href="#joystick-helpers">Helpers</a> &#xa0; | &#xa0;
   <a href="#memo-license">License</a> &#xa0; | &#xa0;
   <a href="https://github.com/ITP-UFRN/UNO" target="_blank">GitHub</a>
 </p>
@@ -203,6 +204,24 @@ Arquivo que define constantes que representam os naipes.
 #ifndef SPADES_U
 #define SPADES_U "♠"
 #endif
+```
+
+## :joystick: Helpers ##
+
+## printHelper
+
+O primeiro e mais simples helper é o printHelper, onde o cabeçalho expõe apenas o método debug():
+```h
+void debug(char *);
+```
+O arquivo printHelper.c contém a implementação do método debug() já disponibilizado pelo professor, possuindo como parâmetro uma string que será impressa no stderr e sem retorno.
+```c
+#include <stdio.h>
+
+void debug(char *message)
+{
+    fprintf(stderr, "%s\n", message);
+}
 ```
 
 ## :memo: License ##
