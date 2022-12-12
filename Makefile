@@ -1,5 +1,5 @@
 all: main.c _creation_helper _print_helper _card_helper _hand_helper _logic_helper
-	gcc main.c creationHelper.o printHelper.o cardHelper.o handHelper.o logicHelper.o -o bot_pablinho.out
+	gcc main.c creationHelper.o printHelper.o cardHelper.o handHelper.o logicHelper.o -o Pablo.bot
 _creation_helper: helpers/creationHelper.c 
 	gcc helpers/creationHelper.c -c
 _print_helper: helpers/printHelper.c 
