@@ -148,10 +148,17 @@ int getIndexCardBy(FIELD f, char *stringSuit, char *stringNumber, HAND *hand)
 
 void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
 {
+    if (strcmp(action, "BUY") == 0 && (strcmp(topTable->number, "V") == 0 || strcmp(topTable->number, "C") == 0))
+    {
+        //debug("Entrou aq");
+        strcpy(topTable->number, "X");
+        return;
+    }
+
     if (strcmp(action, "DISCARD") == 0)
     {
         CARD *new = createCard(complement);
-        if (!cardIsEqualsSuit(new, topTable) && !cardIsEqualsNumber(new, topTable) && !strcmp(new->number, "C") && !strcmp(new->number, "V"))
+        if (!cardIsEqualsSuit(new, topTable) && !cardIsEqualsNumber(new, topTable) && !strcmp(new->number, "C") && !strcmp(new->number, "A"))
         {
             return;
         }
