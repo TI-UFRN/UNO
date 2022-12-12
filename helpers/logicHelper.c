@@ -7,11 +7,14 @@
 #include "../definitions/constants.h"
 #include "../definitions/suits.h"
 #include "../definitions/phrases.h"
+#include "../definitions/field.h"
 
 #include "../helpers/creationHelper.h"
 #include "../helpers/handHelper.h"
 #include "../helpers/printHelper.h"
 #include "../helpers/cardHelper.h"
+
+int getIndexCardBy(FIELD, char *, char *, HAND *);
 
 int quantSuitInHand(HAND *hand, char *suit)
 {
@@ -48,29 +51,99 @@ char *chooseBestSuit(HAND *hand)
     {
     case 0:
         return HEARTS_U;
-        break;
     case 1:
         return DIAMONDS_U;
     case 2:
         return CLUBS_U;
     case 3:
         return SPADES_U;
+    default:
         return HEARTS_U;
     }
 }
 
 CARD *chooseBestCard(CARD *topCard, HAND *hand)
 {
-    for (int i = 0; i < hand->amountCards; i++)
+    // Find any valete
+    int i = getIndexCardBy(VALUE_AND, topCard->suit, "V", hand);
+    if (i != -1)
     {
-        if (cardIsEqualsSuit(topCard, hand->cards[i]) || cardIsEqualsNumber(topCard, hand->cards[i]))
-        {
-            CARD *choice = createCard(hand->cards[i]->value);
-            removeFromHand(hand, hand->cards[i]);
-            return choice;
-        }
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    // Find any Coringa
+    i = getIndexCardBy(NUMBER, "", "C", hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    // Find any Rei
+
+    i = getIndexCardBy(VALUE_AND, topCard->suit, "R", hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    // Find any
+    i = getIndexCardBy(VALUE_OR, topCard->suit, topCard->number, hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
+    }
+    // Find any ÁS
+    i = getIndexCardBy(NUMBER, "", "A", hand);
+    if (i != -1)
+    {
+        CARD *choice = createCard(hand->cards[i]->value);
+        removeFromHand(hand, hand->cards[i]);
+        return choice;
     }
     return NULL;
+}
+
+int getIndexCardBy(FIELD f, char *stringSuit, char *stringNumber, HAND *hand)
+{
+    for (int i = 0; i < hand->amountCards; i++)
+    {
+        switch (f)
+        {
+        case VALUE_OR:
+            if (strcmp(hand->cards[i]->number, stringNumber) == 0 || strcmp(hand->cards[i]->suit, stringSuit) == 0)
+            {
+                return i;
+            }
+            break;
+        case VALUE_AND:
+            if (strcmp(hand->cards[i]->number, stringNumber) == 0 && strcmp(hand->cards[i]->suit, stringSuit) == 0)
+            {
+                return i;
+            }
+            break;
+        case NUMBER:
+            if (strcmp(hand->cards[i]->number, stringNumber) == 0)
+            {
+                return i;
+            }
+            break;
+        case SUIT:
+            if (strcmp(hand->cards[i]->suit, stringSuit) == 0)
+            {
+                return i;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    return -1;
 }
 
 void actionAnotherPlayer(char *action, CARD *topTable, char *complement)
